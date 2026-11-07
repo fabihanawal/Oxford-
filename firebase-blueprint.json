@@ -1,0 +1,250 @@
+{
+  "entities": {
+    "AdmissionApplication": {
+      "title": "AdmissionApplication",
+      "description": "Student admission application record for Oxford Model School 2027 session",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique record identifier"
+        },
+        "applicationNumber": {
+          "type": "string",
+          "description": "Human readable application number e.g. OMS-2027-XXXX",
+          "maxLength": 30
+        },
+        "studentNameBn": {
+          "type": "string",
+          "description": "Student full name in Bengali",
+          "maxLength": 100
+        },
+        "studentNameEn": {
+          "type": "string",
+          "description": "Student full name in English",
+          "maxLength": 100
+        },
+        "gender": {
+          "type": "string",
+          "description": "Gender of the student",
+          "enum": ["male", "female", "other"]
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "description": "Birth date in YYYY-MM-DD",
+          "maxLength": 20
+        },
+        "bloodGroup": {
+          "type": "string",
+          "description": "Blood group",
+          "maxLength": 10
+        },
+        "admissionClass": {
+          "type": "string",
+          "description": "Desired admission class (Nursery to Class 5)",
+          "enum": ["Nursery", "KG", "Class 1", "Class 2", "Class 3", "Class 4", "Class 5"]
+        },
+        "previousSchool": {
+          "type": "string",
+          "description": "Previous school name if any",
+          "maxLength": 150
+        },
+        "studentPhotoUrl": {
+          "type": "string",
+          "description": "Passport size photo of student (data URL or storage URL)"
+        },
+        "fatherName": {
+          "type": "string",
+          "description": "Father's full name",
+          "maxLength": 100
+        },
+        "fatherOccupation": {
+          "type": "string",
+          "description": "Father's occupation",
+          "maxLength": 80
+        },
+        "fatherPhone": {
+          "type": "string",
+          "description": "Father's contact number",
+          "maxLength": 20
+        },
+        "fatherPhotoUrl": {
+          "type": "string",
+          "description": "Photo of father (data URL or storage URL)"
+        },
+        "motherName": {
+          "type": "string",
+          "description": "Mother's full name",
+          "maxLength": 100
+        },
+        "motherOccupation": {
+          "type": "string",
+          "description": "Mother's occupation",
+          "maxLength": 80
+        },
+        "motherPhone": {
+          "type": "string",
+          "description": "Mother's contact number",
+          "maxLength": 20
+        },
+        "motherPhotoUrl": {
+          "type": "string",
+          "description": "Photo of mother (data URL or storage URL)"
+        },
+        "guardianPhone": {
+          "type": "string",
+          "description": "Primary guardian phone number",
+          "maxLength": 20
+        },
+        "guardianEmail": {
+          "type": "string",
+          "description": "Guardian authenticated Gmail address",
+          "maxLength": 120
+        },
+        "applicantUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the guardian",
+          "maxLength": 128
+        },
+        "villageRoad": {
+          "type": "string",
+          "description": "Village or road address",
+          "maxLength": 150
+        },
+        "postOffice": {
+          "type": "string",
+          "description": "Post office name",
+          "maxLength": 80
+        },
+        "upazila": {
+          "type": "string",
+          "description": "Upazila / Sub-district",
+          "maxLength": 80
+        },
+        "district": {
+          "type": "string",
+          "description": "District name",
+          "maxLength": 80
+        },
+        "status": {
+          "type": "string",
+          "description": "Application admission status",
+          "enum": ["pending", "confirmed", "rejected"]
+        },
+        "adminRemarks": {
+          "type": "string",
+          "description": "Administrative notes or remarks",
+          "maxLength": 500
+        },
+        "interviewDate": {
+          "type": "string",
+          "description": "Scheduled interview date or time",
+          "maxLength": 50
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp in ISO or server timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": [
+        "applicationNumber",
+        "studentNameBn",
+        "studentNameEn",
+        "admissionClass",
+        "guardianPhone",
+        "guardianEmail",
+        "applicantUid",
+        "status"
+      ]
+    },
+    "HeroSlide": {
+      "title": "HeroSlide",
+      "description": "Interactive slideshow banners displayed on the homepage",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Slide unique identifier"
+        },
+        "title": {
+          "type": "string",
+          "description": "Headline of the slide",
+          "maxLength": 200
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "Sub-caption or description",
+          "maxLength": 300
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Slide image banner URL or base64 data"
+        },
+        "badgeText": {
+          "type": "string",
+          "description": "Highlight pill badge text",
+          "maxLength": 80
+        },
+        "ctaText": {
+          "type": "string",
+          "description": "Button label",
+          "maxLength": 80
+        },
+        "ctaAction": {
+          "type": "string",
+          "description": "Action type (e.g. apply, explore)",
+          "maxLength": 50
+        },
+        "order": {
+          "type": "number",
+          "description": "Display order index"
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Whether the slide is visible"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["title", "imageUrl", "isActive"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "School administrator authorization marker",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Admin email address",
+          "maxLength": 120
+        },
+        "role": {
+          "type": "string",
+          "description": "Admin privilege level",
+          "maxLength": 30
+        }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/admissions/{applicationId}": {
+      "schema": "AdmissionApplication",
+      "description": "Collection of student admission applications"
+    },
+    "/slides/{slideId}": {
+      "schema": "HeroSlide",
+      "description": "Collection of homepage slideshow banners"
+    },
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Authorized school admins"
+    }
+  }
+}

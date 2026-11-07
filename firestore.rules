@@ -1,0 +1,110 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == 'rstsbd@gmail.com' && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidApplication(data) {
+      return data.keys().hasAll([
+        'applicationNumber',
+        'studentNameBn',
+        'studentNameEn',
+        'admissionClass',
+        'guardianPhone',
+        'guardianEmail',
+        'applicantUid',
+        'status'
+      ]) &&
+      data.applicationNumber is string && data.applicationNumber.size() <= 30 &&
+      data.studentNameBn is string && data.studentNameBn.size() <= 100 &&
+      data.studentNameEn is string && data.studentNameEn.size() <= 100 &&
+      data.admissionClass in ['Nursery', 'KG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'] &&
+      data.guardianPhone is string && data.guardianPhone.size() <= 20 &&
+      data.guardianEmail is string && data.guardianEmail.size() <= 120 &&
+      data.applicantUid is string && data.applicantUid.size() <= 128 &&
+      data.status in ['pending', 'confirmed', 'rejected'] &&
+      (!('gender' in data) || (data.gender in ['male', 'female', 'other'])) &&
+      (!('bloodGroup' in data) || (data.bloodGroup is string && data.bloodGroup.size() <= 10)) &&
+      (!('dateOfBirth' in data) || (data.dateOfBirth is string && data.dateOfBirth.size() <= 20)) &&
+      (!('fatherName' in data) || (data.fatherName is string && data.fatherName.size() <= 100)) &&
+      (!('fatherOccupation' in data) || (data.fatherOccupation is string && data.fatherOccupation.size() <= 80)) &&
+      (!('fatherPhone' in data) || (data.fatherPhone is string && data.fatherPhone.size() <= 20)) &&
+      (!('motherName' in data) || (data.motherName is string && data.motherName.size() <= 100)) &&
+      (!('motherOccupation' in data) || (data.motherOccupation is string && data.motherOccupation.size() <= 80)) &&
+      (!('motherPhone' in data) || (data.motherPhone is string && data.motherPhone.size() <= 20)) &&
+      (!('studentPhotoUrl' in data) || (data.studentPhotoUrl is string)) &&
+      (!('fatherPhotoUrl' in data) || (data.fatherPhotoUrl is string)) &&
+      (!('motherPhotoUrl' in data) || (data.motherPhotoUrl is string)) &&
+      (!('villageRoad' in data) || (data.villageRoad is string && data.villageRoad.size() <= 150)) &&
+      (!('postOffice' in data) || (data.postOffice is string && data.postOffice.size() <= 80)) &&
+      (!('upazila' in data) || (data.upazila is string && data.upazila.size() <= 80)) &&
+      (!('district' in data) || (data.district is string && data.district.size() <= 80)) &&
+      (!('previousSchool' in data) || (data.previousSchool is string && data.previousSchool.size() <= 150)) &&
+      (!('adminRemarks' in data) || (data.adminRemarks is string && data.adminRemarks.size() <= 500)) &&
+      (!('interviewDate' in data) || (data.interviewDate is string && data.interviewDate.size() <= 50));
+    }
+
+    match /admissions/{applicationId} {
+      allow get: if isSignedIn() && (isAdmin() || existing().applicantUid == request.auth.uid);
+      allow list: if isSignedIn() && (isAdmin() || resource.data.applicantUid == request.auth.uid);
+      
+      allow create: if isSignedIn() &&
+        isValidId(applicationId) &&
+        isValidApplication(incoming()) &&
+        incoming().applicantUid == request.auth.uid &&
+        incoming().guardianEmail == request.auth.token.email &&
+        incoming().status == 'pending';
+
+      allow update: if isSignedIn() &&
+        isAdmin() &&
+        isValidId(applicationId) &&
+        isValidApplication(incoming()) &&
+        incoming().applicantUid == existing().applicantUid &&
+        incoming().applicationNumber == existing().applicationNumber;
+
+      allow delete: if isSignedIn() && isAdmin() && isValidId(applicationId);
+    }
+
+    // Homepage Slideshow banners
+    match /slides/{slideId} {
+      allow read: if true;
+      allow create, update, delete: if isSignedIn() && isAdmin() && isValidId(slideId);
+    }
+
+    match /admins/{adminId} {
+      allow read: if isSignedIn() && (isAdmin() || request.auth.uid == adminId);
+      allow write: if false; // System managed
+    }
+  }
+}
